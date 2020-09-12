@@ -20,35 +20,35 @@ stages:
    - job: Build     
      steps:
     ###### Dot Net Build to build projects
-    - task: UseDotNet@2
-      inputs:
+     - task: UseDotNet@2
+       inputs:
         version: '3.0.x'
         packageType: runtime
-    - task: DotNetCoreCLI@2
-      displayName: 'dotnet restore'
-      inputs:
+     - task: DotNetCoreCLI@2
+       displayName: 'dotnet restore'
+       inputs:
         command: restore
         projects: '**/*.csproj'
-    - task: DotNetCoreCLI@2
-      displayName: 'dotnet build'
-      inputs:
+     - task: DotNetCoreCLI@2
+       displayName: 'dotnet build'
+       inputs:
         projects: '**/*.csproj'
         command: 'build'
         arguments: '--configuration $(buildConfiguration)'
-    - script: |
+     - script: |
         echo 'Default Working Directory: $(workDir)'
-    - script: |
+     - script: |
         ls -ltr $(workDir)
         
     ### Dot net core publish to copy build to artifact staging directory
-    - task: DotNetCoreCLI@2
-      inputs:
+     - task: DotNetCoreCLI@2
+       inputs:
         command: publish
         publishWebProjects: True
         arguments: '--configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)'
         zipAfterPublish: True
-    - task: PublishBuildArtifacts@1
-      inputs:
+     - task: PublishBuildArtifacts@1
+       inputs:
         pathtoPublish: '$(Build.ArtifactStagingDirectory)' 
         artifactName: '$(buildArtifactName)'
 - stage: Deploy
