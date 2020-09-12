@@ -50,7 +50,7 @@ stages:
      - task: CopyFiles@2
        displayName: 'Copy Files'
        inputs:
-        SourceFolder: 'HopefulMommaDesignsAPI/HopefulMommaDesignsAPI/AzureResourceGroup'
+        SourceFolder: 'KubernetesExample/KubernetesExample/AzureResourceGroup'
         Contents: '*.json'
         TargetFolder: '$(Build.ArtifactStagingDirectory)/AzureResourceGroup'
      - task: PublishBuildArtifacts@1
