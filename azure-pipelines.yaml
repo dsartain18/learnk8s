@@ -19,22 +19,38 @@ stages:
    jobs:
    - job: Build     
      steps:
-     - task: NuGetToolInstaller@1
-     - task: NuGetCommand@2
-       inputs:
-         restoreSolution: '$(solution)'      
-     - task: VSBuild@1
-       inputs: 
-         solution: '$(solution)'
-         msbuildArgs: '/p:DeployOnBuild=true /p:WebPublishMethod=Package /p:PackageAsSingleFile=true /p:SkipInvalidConfigurations=true /p:PackageLocation="$(build.artifactstagingdirectory)\\"'
-         platform: '$(buildPlatform)'
-         configuration: '$(buildConfiguration)'
-     # this code takes all the files in $(Build.ArtifactStagingDirectory) and uploads them as an artifact of your build.
-     - task: PublishBuildArtifacts@1
-       inputs:
-         pathtoPublish: '$(Build.ArtifactStagingDirectory)' 
-         artifactName: '$(buildArtifactName)'
-         publishLocation: 'container' # Options: container, filePath
+    ###### Dot Net Build to build projects
+    - task: UseDotNet@2
+      inputs:
+        version: '3.0.x'
+        packageType: runtime
+    - task: DotNetCoreCLI@2
+      displayName: 'dotnet restore'
+      inputs:
+        command: restore
+        projects: '**/*.csproj'
+    - task: DotNetCoreCLI@2
+      displayName: 'dotnet build'
+      inputs:
+        projects: '**/*.csproj'
+        command: 'build'
+        arguments: '--configuration $(buildConfiguration)'
+    - script: |
+        echo 'Default Working Directory: $(workDir)'
+    - script: |
+        ls -ltr $(workDir)
+        
+    ### Dot net core publish to copy build to artifact staging directory
+    - task: DotNetCoreCLI@2
+      inputs:
+        command: publish
+        publishWebProjects: True
+        arguments: '--configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)'
+        zipAfterPublish: True
+    - task: PublishBuildArtifacts@1
+      inputs:
+        pathtoPublish: '$(Build.ArtifactStagingDirectory)' 
+        artifactName: '$(buildArtifactName)'
 - stage: Deploy
   jobs: 
   - deployment: DeployDev
