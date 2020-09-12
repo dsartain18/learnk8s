@@ -36,9 +36,9 @@ stages:
         command: 'build'
         arguments: '--configuration $(buildConfiguration)'
      - script: |
-        echo 'Default Working Directory: $(workDir)'
+        echo 'Default Working Directory: $(System.DefaultWorkingDirectory)'
      - script: |
-        ls -ltr $(workDir)
+        ls -ltr $(System.DefaultWorkingDirectory)
         
     ### Dot net core publish to copy build to artifact staging directory
      - task: DotNetCoreCLI@2
