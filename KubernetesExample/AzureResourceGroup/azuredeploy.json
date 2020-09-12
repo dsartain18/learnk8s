@@ -92,7 +92,7 @@
             "osType": "[parameters('osType')]",
             "storageProfile": "ManagedDisks",
             "type": "VirtualMachineScaleSets",
-            "mode": "User"
+            "mode": "System"
           }
         ]
       }
