@@ -47,6 +47,14 @@ stages:
         publishWebProjects: True
         arguments: '--configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)'
         zipAfterPublish: False
+     - task: CopyFiles@2
+       displayName: 'Copy Files'
+       inputs:
+        SourceFolder: 'HopefulMommaDesignsAPI/HopefulMommaDesignsAPI/AzureResourceGroup'
+        Contents: '*.json'
+        TargetFolder: '$(Build.ArtifactStagingDirectory)/AzureResourceGroup'
+    - script : |
+       mkdir $(newDir)/$(imageName)
      - task: PublishBuildArtifacts@1
        inputs:
         pathtoPublish: '$(Build.ArtifactStagingDirectory)' 
