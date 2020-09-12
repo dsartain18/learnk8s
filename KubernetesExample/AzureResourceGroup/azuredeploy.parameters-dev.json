@@ -3,10 +3,10 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "aksClusterName": {
-      "value": "GEN-UNIQUE"
+      "value": "transformingdev-aks"
     },
     "dnsPrefix": {
-      "value": "GEN-UNIQUE"
+      "value": "transformingdev-dns"
     },
     "environment": {
       "value": "dev"
