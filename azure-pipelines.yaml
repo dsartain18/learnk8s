@@ -53,12 +53,10 @@ stages:
         SourceFolder: 'HopefulMommaDesignsAPI/HopefulMommaDesignsAPI/AzureResourceGroup'
         Contents: '*.json'
         TargetFolder: '$(Build.ArtifactStagingDirectory)/AzureResourceGroup'
-    - script : |
-       mkdir $(newDir)/$(imageName)
      - task: PublishBuildArtifacts@1
        inputs:
-        pathtoPublish: '$(Build.ArtifactStagingDirectory)' 
-        artifactName: '$(buildArtifactName)'
+         pathtoPublish: '$(Build.ArtifactStagingDirectory)' 
+         artifactName: '$(buildArtifactName)'
 - stage: Deploy
   jobs: 
   - deployment: DeployDev
