@@ -1,0 +1,62 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+trigger:
+- develop
+
+pool:
+  vmImage: 'windows-2019'
+variables:
+  system.debug: "true"
+  solution: '**\*.sln'
+  buildPlatform: 'Any CPU'
+  buildConfiguration: 'Release' 
+  buildArtifactName: drop
+stages:
+-  stage: Build
+   jobs:
+   - job: Build     
+     steps:
+     - task: NuGetToolInstaller@1
+     - task: NuGetCommand@2
+       inputs:
+         restoreSolution: '$(solution)'      
+     - task: VSBuild@1
+       inputs: 
+         solution: '$(solution)'
+         msbuildArgs: '/p:DeployOnBuild=true /p:WebPublishMethod=Package /p:PackageAsSingleFile=true /p:SkipInvalidConfigurations=true /p:PackageLocation="$(build.artifactstagingdirectory)\\"'
+         platform: '$(buildPlatform)'
+         configuration: '$(buildConfiguration)'
+     # this code takes all the files in $(Build.ArtifactStagingDirectory) and uploads them as an artifact of your build.
+     - task: PublishBuildArtifacts@1
+       inputs:
+         pathtoPublish: '$(Build.ArtifactStagingDirectory)' 
+         artifactName: '$(buildArtifactName)'
+         publishLocation: 'container' # Options: container, filePath
+- stage: Deploy
+  jobs: 
+  - deployment: DeployDev
+    displayName: Deploy Dev
+    pool:
+      vmImage: 'vs2017-win2016'
+    environment: 'learnk8s-cloud-dev'
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+            - script: |
+                dir $(Pipeline.Workspace)\$(buildArtifactName)\AzureResourceGroup
+            - task: AzureResourceManagerTemplateDeployment@3
+              inputs:
+                deploymentScope: 'Resource Group'
+                azureResourceManagerConnection: 'TransformingDev'
+                subscriptionId: '91d5a083-c93b-4df9-b783-478aab256259'
+                action: 'Create Or Update Resource Group'
+                resourceGroupName: 'learnk8s'
+                location: 'South Central US'
+                templateLocation: 'Linked artifact'
+                csmFile: '$(Pipeline.Workspace)/$(buildArtifactName)/AzureResourceGroup/azuredeploy.json'
+                csmParametersFile: '$(Pipeline.Workspace)/$(buildArtifactName)/AzureResourceGroup/azuredeploy.parameters-dev.json'
+                deploymentMode: 'Incremental'
